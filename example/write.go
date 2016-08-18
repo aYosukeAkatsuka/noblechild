@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/shirou/gatt"
+	"github.com/paypal/gatt"
 
 	noblechild "github.com/shirou/noblechild"
 )

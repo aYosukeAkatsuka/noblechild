@@ -9,7 +9,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/shirou/gatt"
+	"github.com/paypal/gatt"
 
 	"github.com/shirou/noblechild"
 )

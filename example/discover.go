@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	gatt "github.com/shirou/gatt"
+	gatt "github.com/paypal/gatt"
 
 	noblechild "github.com/shirou/noblechild"
 )
