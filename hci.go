@@ -96,6 +96,7 @@ func (hci *HCI_BLE) Close() error {
 	if err != nil {
 		return fmt.Errorf("hci close: stop hci failed:%s", err)
 	}
+	isHciBleStarted = false
 	return nil
 }
 
@@ -110,7 +111,7 @@ func (hci *HCI_BLE) Out() {
 
 func (hci *HCI_BLE) StartScan() error {
 	log.Debugf("noblechild: start scan  pid: %d", hci.command.Process.Pid)
-	time.Sleep(1 * time.Second)
+	time.Sleep(3 * time.Second)
 
 	return hci.command.Process.Signal(syscall.SIGUSR1)
 }

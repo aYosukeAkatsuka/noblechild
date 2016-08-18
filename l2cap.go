@@ -38,6 +38,7 @@ type L2CAP_BLE struct {
 	path       string
 	stdinPipe  io.WriteCloser
 	stdoutPipe io.ReadCloser
+	stderrPipe io.ReadCloser
 	command    *exec.Cmd
 
 	device *device
@@ -71,6 +72,13 @@ func (l2cap *L2CAP_BLE) Init(address, addressType string) error {
 		fmt.Println("l2cap StdinPipe Error.")
 		return err
 	}
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		fmt.Println("l2cap StdinPipe Error.")
+		return err
+	}
+
+	go printOutputWithHeader(stderr)
 
 	l2cap.stdinPipe = stdin
 	l2cap.stdoutPipe = stdout
@@ -84,6 +92,13 @@ func (l2cap *L2CAP_BLE) Init(address, addressType string) error {
 	go cmd.Wait()
 
 	return nil
+}
+
+func printOutputWithHeader(r io.Reader) {
+	scanner := bufio.NewScanner(r)
+	for scanner.Scan() {
+		fmt.Printf("@@@@@ %s\n", scanner.Text())
+	}
 }
 
 func (l2cap *L2CAP_BLE) Close() error {

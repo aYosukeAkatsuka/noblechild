@@ -31,7 +31,7 @@ struct l2cap_conninfo {
 int lastSignal = 0;
 
 static void signalHandler(int signal) {
-	printf("[%s] !! l2cap SIGNAL Detected. signal = %d\n", __func__, signal);
+  fprintf(stderr, "[%s] !! l2cap SIGNAL Detected. signal = %d\n", __func__, signal);
   lastSignal = signal;
 }
 
@@ -53,9 +53,7 @@ int main(int argc, const char* argv[]) {
   int len;
   int i;
 
-  setvbuf(stdin, NULL, _IONBF, 0);
   setvbuf(stdout, NULL, _IONBF, 0);
-  setvbuf(stderr, NULL, _IONBF, 0);
 
   // setup signal handlers
   signal(SIGINT, signalHandler);
@@ -78,7 +76,7 @@ int main(int argc, const char* argv[]) {
 
   result = bind(l2capSock, (struct sockaddr*)&sockAddr, sizeof(sockAddr));
 
-  printf("bind %s\n", (result == -1) ? strerror(errno) : "success");
+  fprintf(stderr, "bind %s\n", (result == -1) ? strerror(errno) : "success");
 
   // connect
   memset(&sockAddr, 0, sizeof(sockAddr));
@@ -103,10 +101,13 @@ int main(int argc, const char* argv[]) {
     tv.tv_sec = 1;
     tv.tv_usec = 0;
 
+	fprintf(stderr, "beginning of while loop\n");
     result = select(l2capSock + 1, &rfds, NULL, NULL, &tv);
 
+	fprintf(stderr, "select result = %d, lastSignal = %d\n", result, lastSignal);
     if (-1 == result) {
       if (SIGINT == lastSignal || SIGKILL == lastSignal || SIGHUP == lastSignal) {
+		fprintf(stderr, "signal to termination received.\n");
         break;
       }
 
@@ -128,8 +129,15 @@ int main(int argc, const char* argv[]) {
         printf("rssi = %d\n", rssi);
       }
     } else if (result) {
+		int j, n;
       if (FD_ISSET(0, &rfds)) {
         len = read(0, stdinBuf, sizeof(stdinBuf));
+		fprintf(stderr, "read len = %d\n", len);
+		fprintf(stderr, "stdinBuf =\n");
+		for (j = 0; j < len; j++) {
+			fprintf(stderr, "%c", stdinBuf[j]);
+		}
+		fprintf(stderr, "\n");
 
         i = 0;
         while(stdinBuf[i] != '\n') {
@@ -138,7 +146,14 @@ int main(int argc, const char* argv[]) {
           i += 2;
         }
 
-        len = write(l2capSock, l2capSockBuf, (len - 1) / 2);
+        n = write(l2capSock, l2capSockBuf, (len - 1) / 2);
+		fprintf(stderr, "n = %d\n", n);
+		fprintf(stderr, "l2capSockBuf =\n");
+		for (j = 0; j < (len - 1) / 2; j++) {
+			fprintf(stderr, "%02x ", l2capSockBuf[j]);
+		}
+		fprintf(stderr, "\n");
+
       }
 
       if (FD_ISSET(l2capSock, &rfds)) {
@@ -160,6 +175,7 @@ int main(int argc, const char* argv[]) {
   close(l2capSock);
   close(hciSocket);
   printf("disconnect\n");
+  fprintf(stderr, "disconnect\n");
 
   return 0;
 }

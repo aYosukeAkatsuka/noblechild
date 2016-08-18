@@ -71,7 +71,7 @@ func (d *device) Stop() error {
 			return fmt.Errorf("device Stop l2cap failed: uuid:%s, %s", uuid, err)
 		}
 	}
-	d.l2caps = nil
+	d.l2caps = map[string]*L2CAP_BLE{}
 
 	return nil
 

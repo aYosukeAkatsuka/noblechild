@@ -14,7 +14,7 @@
 int lastSignal = 0;
 
 static void signalHandler(int signal) {
-	printf("[%s] !! hci SIGNAL Detected. signal = %d\n", __func__, signal);
+  fprintf(stderr, "[%s] !! hci SIGNAL Detected. signal = %d\n", __func__, signal);
   lastSignal = signal;
 }
 
@@ -44,9 +44,7 @@ int main(int argc, const char* argv[])
   int8_t rssi;
   int scanning = 0;
 
-  setvbuf(stdin, NULL, _IONBF, 0);
   setvbuf(stdout, NULL, _IONBF, 0);
-  setvbuf(stderr, NULL, _IONBF, 0);
 
   memset(&hciDevInfo, 0x00, sizeof(hciDevInfo));
 
@@ -123,7 +121,7 @@ int main(int argc, const char* argv[])
       } else if (SIGHUP == lastSignal) {
         // stop scan
 		scanning = 0;
-		printf("[hci] scan has been stopped.\n");
+		fprintf(stderr, "[hci] scan has been stopped.\n");
         hci_le_set_scan_enable(hciSocket, 0x00, 0, 1000);
       } 
     } else if (selectRetval) {
