@@ -40,6 +40,7 @@ func NewPeripheral(d *device, l2cap *L2CAP_BLE, address string) peripheral {
 		Address: address,
 		reqc:    make(chan message),
 		quitc:   make(chan struct{}),
+		sub:     newSubscriber(),
 	}
 	go p.loop()
 

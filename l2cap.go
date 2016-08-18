@@ -63,10 +63,12 @@ func (l2cap *L2CAP_BLE) Init(address, addressType string) error {
 	cmd := exec.Command(l2cap.path, addr, addressType)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
+		fmt.Println("l2cap StdoutPipe Error.")
 		return err
 	}
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
+		fmt.Println("l2cap StdinPipe Error.")
 		return err
 	}
 
@@ -91,7 +93,7 @@ func (l2cap *L2CAP_BLE) Close() error {
 	l2cap.stdoutPipe.Close()
 
 	err := l2cap.command.Process.Signal(syscall.SIGINT)
-	if err != nil && err != errFinished {
+	if err != nil && err.Error() != errFinished.Error() {
 		log.Infof("fail to stop l2cap: %s, %s", l2cap.Address, err)
 		return err
 	}
@@ -103,10 +105,12 @@ func (l2cap *L2CAP_BLE) Write(buf []byte) (int, error) {
 	data = strings.TrimSpace(data) + "\n"
 	log.Debugf("l2cap write:%v,%s", buf, strings.TrimSpace(data))
 
-	n, err := io.WriteString(l2cap.stdinPipe, data)
+	writer := bufio.NewWriter(l2cap.stdinPipe)
+	n, err := writer.WriteString(data)
 	if err != nil {
 		return -1, fmt.Errorf("l2cap write err: %s", err)
 	}
+	writer.Flush()
 	return n, nil
 }
 func (l2cap *L2CAP_BLE) Read(b []byte) (int, error) {
@@ -204,6 +208,7 @@ func (l2cap *L2CAP_BLE) ParseStdout(buf string) error {
 func (l2cap *L2CAP_BLE) Disconnect() error {
 	return l2cap.command.Process.Signal(syscall.SIGHUP)
 }
+
 func (l2cap *L2CAP_BLE) UpdateRssi() error {
 	return l2cap.command.Process.Signal(syscall.SIGUSR1)
 }

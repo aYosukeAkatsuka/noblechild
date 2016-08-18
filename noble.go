@@ -19,8 +19,7 @@ type NobleModule struct {
 }
 
 func init() {
-	//	log.SetLevel(log.DebugLevel)
-	log.SetLevel(log.InfoLevel)
+	log.SetLevel(log.DebugLevel)
 }
 
 // FindNobleModule finds noble module binaries such as hci-ble and l2cap-ble.
@@ -31,28 +30,24 @@ func FindNobleModule() (NobleModule, error) {
 	}
 
 	paths := []string{
-		os.Getenv("NOBLE_TOPDIR"),
 		dir,
-		os.Getenv("HOME"),
 	}
 
 	var m NobleModule
 	for _, p := range paths {
-		dir := path.Join(p, "node_modules", "noble", "build", "Release")
-
-		hci := path.Join(dir, "hci-ble")
+		hci := path.Join(p, "hci-ble")
 		_, err := os.Stat(hci)
 		if err != nil {
 			continue
 		}
-		l2cap := path.Join(dir, "l2cap-ble")
+		l2cap := path.Join(p, "l2cap-ble")
 		_, err = os.Stat(l2cap)
 		if err != nil {
 			continue
 		}
 
 		m := NobleModule{
-			Directory: dir,
+			Directory: p,
 			HCIPath:   hci,
 			L2CAPPath: l2cap,
 		}

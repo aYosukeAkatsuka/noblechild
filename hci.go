@@ -17,8 +17,9 @@ import (
 )
 
 var (
-	adapterRegex = regexp.MustCompile("^adapterState (.*)$")
-	eventRegex   = regexp.MustCompile("^event (.*)$")
+	adapterRegex    = regexp.MustCompile("^adapterState (.*)$")
+	eventRegex      = regexp.MustCompile("^event (.*)$")
+	isHciBleStarted = false
 )
 
 // HCI_BLE is a struct to use noble's hci-ble binary.
@@ -59,6 +60,10 @@ func NewHCI(d *device, path string) (*HCI_BLE, error) {
 }
 
 func (hci *HCI_BLE) Init() error {
+	if isHciBleStarted {
+		fmt.Println("hci-ble is already started. return.")
+		return nil
+	}
 	cmd := exec.Command(hci.path)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
@@ -105,7 +110,7 @@ func (hci *HCI_BLE) Out() {
 
 func (hci *HCI_BLE) StartScan() error {
 	log.Debugf("noblechild: start scan  pid: %d", hci.command.Process.Pid)
-	time.Sleep(3 * time.Second)
+	time.Sleep(1 * time.Second)
 
 	return hci.command.Process.Signal(syscall.SIGUSR1)
 }

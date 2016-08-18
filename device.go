@@ -156,6 +156,19 @@ func (d *device) CancelConnection(p gatt.Peripheral) {
 	l2cap.Close()
 }
 
+func (d *device) Disconnect(p gatt.Peripheral) {
+	address := p.ID()
+	l2cap, ok := d.l2caps[address]
+	if !ok {
+		log.Printf("no such perfipheral id connected: %s", address)
+		return
+	}
+	delete(d.l2caps, address)
+
+	l2cap.Disconnect()
+	fmt.Println("l2cap disconnect called.")
+}
+
 /*
 func (d *device) SendHCIRawCommand(c cmd.CmdParam) ([]byte, error) {
 	return []byte{}, NotImplementedError
