@@ -14,6 +14,7 @@
 int lastSignal = 0;
 
 static void signalHandler(int signal) {
+	printf("[%s] !! hci SIGNAL Detected. signal = %d\n", __func__, signal);
   lastSignal = signal;
 }
 
@@ -41,8 +42,12 @@ int main(int argc, const char* argv[])
   char btAddress[18];
   int i;
   int8_t rssi;
+  int scanning = 0;
 
+  setvbuf(stdin, NULL, _IONBF, 0);
   setvbuf(stdout, NULL, _IONBF, 0);
+  setvbuf(stderr, NULL, _IONBF, 0);
+
   memset(&hciDevInfo, 0x00, sizeof(hciDevInfo));
 
   // setup signal handlers
@@ -107,14 +112,18 @@ int main(int argc, const char* argv[])
         break;
       } else if (SIGUSR1 == lastSignal) {
         // start scan, filter
+		scanning = 1;
         hci_le_set_scan_enable(hciSocket, 0x00, 1, 1000);
         hci_le_set_scan_enable(hciSocket, 0x01, 1, 1000);
       } else if (SIGUSR2 == lastSignal) {
         // start scan, no filter
+		scanning = 1;
         hci_le_set_scan_enable(hciSocket, 0x00, 0, 1000);
         hci_le_set_scan_enable(hciSocket, 0x01, 0, 1000);
       } else if (SIGHUP == lastSignal) {
         // stop scan
+		scanning = 0;
+		printf("[hci] scan has been stopped.\n");
         hci_le_set_scan_enable(hciSocket, 0x00, 0, 1000);
       } 
     } else if (selectRetval) {
@@ -122,6 +131,10 @@ int main(int argc, const char* argv[])
       hciEventLen = read(hciSocket, hciEventBuf, sizeof(hciEventBuf));
       leMetaEvent = (evt_le_meta_event *)(hciEventBuf + (1 + HCI_EVENT_HDR_SIZE));
       hciEventLen -= (1 + HCI_EVENT_HDR_SIZE);
+
+	  if (!scanning) {
+		  continue;
+	  }
 
       if (leMetaEvent->subevent != 0x02) {
         continue;

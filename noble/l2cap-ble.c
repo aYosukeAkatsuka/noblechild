@@ -31,6 +31,7 @@ struct l2cap_conninfo {
 int lastSignal = 0;
 
 static void signalHandler(int signal) {
+	printf("[%s] !! l2cap SIGNAL Detected. signal = %d\n", __func__, signal);
   lastSignal = signal;
 }
 
@@ -52,7 +53,9 @@ int main(int argc, const char* argv[]) {
   int len;
   int i;
 
+  setvbuf(stdin, NULL, _IONBF, 0);
   setvbuf(stdout, NULL, _IONBF, 0);
+  setvbuf(stderr, NULL, _IONBF, 0);
 
   // setup signal handlers
   signal(SIGINT, signalHandler);
