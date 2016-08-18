@@ -52,6 +52,8 @@ int main(int argc, const char* argv[]) {
   int len;
   int i;
 
+  setvbuf(stdout, NULL, _IONBF, 0);
+
   // setup signal handlers
   signal(SIGINT, signalHandler);
   signal(SIGKILL, signalHandler);
