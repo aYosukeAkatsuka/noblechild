@@ -19,7 +19,8 @@ type NobleModule struct {
 }
 
 func init() {
-	log.SetLevel(log.DebugLevel)
+	//log.SetLevel(log.DebugLevel)
+	log.SetLevel(log.InfoLevel)
 }
 
 // FindNobleModule finds noble module binaries such as hci-ble and l2cap-ble.
