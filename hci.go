@@ -234,7 +234,7 @@ func parseEIR(eir []byte) (gatt.Advertisement, error) {
 			break
 		}
 		length := int(eir[i])
-		if i+2+length > len(eir) {
+		if i+2+length > len(eir) || length <= 0 {
 			break
 		}
 		t := eir[i+1]
